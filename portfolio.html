@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tushar Pathneja | Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.9.1/dist/gsap.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #7c3aed;
+            --dark: #1e1e2c;
+            --light: #f3f4f6;
+            --success: #10b981;
+            --info: #3b82f6;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, var(--info), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero-section {
+            min-height: 100vh;
+            background: linear-gradient(135deg, rgba(16, 16, 24, 0.9), rgba(30, 30, 44, 0.8)), 
+                        url('https://cdn1.genspark.ai/user-upload-image/5_generated/0e72f2d5-9c6f-4965-a118-358de62f8c13_wm') no-repeat center center/cover;
+            position: relative;
+        }
+        
+        .about-section {
+            background: linear-gradient(135deg, rgba(30, 30, 44, 0.9), rgba(16, 16, 24, 0.8)),
+                        url('https://cdn1.genspark.ai/user-upload-image/5_generated/cd2c2721-16a7-4468-8c42-874b15ee0980_wm') no-repeat center center/cover;
+        }
+        
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: all 0.3s ease;
+        }
+        
+        .card-3d:hover {
+            transform: rotateY(10deg) rotateX(5deg);
+            box-shadow: 0 25px 50px rgba(79, 70, 229, 0.2);
+        }
+        
+        .card-content {
+            transform: translateZ(20px);
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .glowing-border {
+            position: relative;
+        }
+        
+        .glowing-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            background: linear-gradient(45deg, var(--primary), var(--info), var(--secondary), var(--primary));
+            background-size: 400% 400%;
+            z-index: -1;
+            border-radius: inherit;
+            animation: glowing 10s ease infinite;
+        }
+        
+        @keyframes glowing {
+            0% { background-position: 0 0; }
+            50% { background-position: 400% 0; }
+            100% { background-position: 0 0; }
+        }
+        
+        .progress-bar {
+            position: relative;
+            width: 100%;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            border-radius: 4px;
+            animation: progress-animation 2s ease-out forwards;
+            background: linear-gradient(90deg, var(--info), var(--secondary));
+        }
+        
+        @keyframes progress-animation {
+            from { width: 0; }
+            to { width: var(--progress-width); }
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 24px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            z-index: 1;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 12px;
+            width: 2px;
+            height: calc(100% + 12px);
+            background-color: rgba(79, 70, 229, 0.3);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+        
+        .skill-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--info);
+            transition: all 0.3s ease;
+        }
+        
+        .skill-card:hover .skill-icon {
+            transform: scale(1.2);
+            color: var(--secondary);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--info), var(--secondary));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+        }
+        
+        .btn-primary:hover::before {
+            width: 300%;
+            height: 300%;
+        }
+        
+        @media print {
+            .hero-section, .about-section {
+                background: var(--dark) !important;
+            }
+            
+            #canvas-container {
+                display: none;
+            }
+            
+            section {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full bg-opacity-80 bg-gray-900 backdrop-filter backdrop-blur-md z-50 shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <a href="#" class="text-2xl font-bold gradient-text">TP</a>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#about" class="nav-link text-gray-300 hover:text-white">About</a>
+                    <a href="#education" class="nav-link text-gray-300 hover:text-white">Education</a>
+                    <a href="#skills" class="nav-link text-gray-300 hover:text-white">Skills</a>
+                    <a href="#experience" class="nav-link text-gray-300 hover:text-white">Experience</a>
+                    <a href="#projects" class="nav-link text-gray-300 hover:text-white">Projects</a>
+                    <a href="#contact" class="nav-link text-gray-300 hover:text-white">Contact</a>
+                </div>
+                <button class="md:hidden text-white focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section id="home" class="hero-section flex items-center justify-center">
+        <div class="container mx-auto px-4 py-20">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <div class="glowing-border p-1 rounded-full w-64 h-64 mx-auto overflow-hidden">
+                        <div class="w-full h-full rounded-full overflow-hidden">
+                            <img src="https://cdn1.genspark.ai/user-upload-image/5_generated/944ded38-53ee-4e22-bd2d-f56cf5115d6e_wm" alt="Tushar Pathneja" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2 text-center md:text-left">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-4">
+                        <span class="gradient-text">Tushar Pathneja</span>
+                    </h1>
+                    <h2 class="text-2xl md:text-3xl font-semibold mb-6 text-gray-300">Computer Science Engineering Student</h2>
+                    <p class="text-xl text-gray-400 mb-8">Specializing in Cloud Computing</p>
+                    <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                        <a href="#contact" class="btn-primary px-8 py-3 rounded-full font-semibold text-white shadow-lg hover:shadow-xl transition-all">Get In Touch</a>
+                        <a href="#about" class="bg-transparent border-2 border-gray-400 hover:border-white px-8 py-3 rounded-full font-semibold text-gray-300 hover:text-white transition-all">About Me</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about" class="about-section py-20">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">About <span class="gradient-text">Me</span></h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto"></div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <div class="card-3d bg-gray-800 bg-opacity-70 p-8 rounded-2xl shadow-xl mx-4">
+                        <div class="card-content">
+                            <h3 class="text-2xl font-semibold mb-4 gradient-text">Professional Summary</h3>
+                            <p class="text-gray-300 mb-6 leading-relaxed">
+                                I am a 2nd year Student pursuing B.E. (CSE) with specialization in Cloud Computing. I have a strong foundation in C, C++, and cloud computing. My academic and practical experiences have equipped me with a deep understanding of Data Structures, Cloud Computing, Frontend Development, and Network Operations.
+                            </p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-gray-400 mb-1"><span class="font-semibold text-white">Name:</span> Tushar Pathneja</p>
+                                    <p class="text-gray-400 mb-1"><span class="font-semibold text-white">Phone:</span> +91 8950365277</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400 mb-1"><span class="font-semibold text-white">Email:</span> tusharpathneja99@gmail.com</p>
+                                    <p class="text-gray-400 mb-1"><span class="font-semibold text-white">Location:</span> Kharar, India</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="card-3d bg-gray-800 bg-opacity-70 p-8 rounded-2xl shadow-xl mx-4">
+                        <div class="card-content">
+                            <h3 class="text-2xl font-semibold mb-6 gradient-text">What I Do</h3>
+                            <div class="space-y-6">
+                                <div class="flex items-start">
+                                    <div class="text-purple-500 mr-4">
+                                        <i class="fas fa-cloud text-3xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-semibold mb-2">Cloud Computing</h4>
+                                        <p class="text-gray-400">Exploring cloud technologies and services to build scalable solutions.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="text-blue-500 mr-4">
+                                        <i class="fas fa-code text-3xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-semibold mb-2">Programming</h4>
+                                        <p class="text-gray-400">Proficient in C++, Java, and Python programming languages.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="text-green-500 mr-4">
+                                        <i class="fas fa-laptop-code text-3xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xl font-semibold mb-2">Frontend Development</h4>
+                                        <p class="text-gray-400">Creating responsive and user-friendly web interfaces.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Education Section -->
+    <section id="education" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">My <span class="gradient-text">Education</span></h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card-3d bg-gray-800 p-8 rounded-2xl shadow-xl">
+                    <div class="card-content">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center mr-4">
+                                <i class="fas fa-university text-white text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-semibold gradient-text">Bachelor's Degree</h3>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">Computer Science Engineering</h4>
+                        <p class="text-gray-400 mb-2">Specialization in Cloud Computing</p>
+                        <p class="text-gray-400 mb-2">Chandigarh University, Gharuan</p>
+                        <p class="text-gray-400 mb-4">Session: 2023-2027</p>
+                        <div class="flex items-center">
+                            <div class="bg-purple-900 text-purple-100 px-4 py-1 rounded-full">
+                                <span class="font-semibold">CGPA: 7.45</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-3d bg-gray-800 p-8 rounded-2xl shadow-xl">
+                    <div class="card-content">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center mr-4">
+                                <i class="fas fa-school text-white text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-semibold gradient-text">Intermediate</h3>
+                        </div>
+                        <h4 class="text-xl font-semibold mb-2">CBSE</h4>
+                        <p class="text-gray-400 mb-2">Vishwa International Academy, West-Delhi</p>
+                        <p class="text-gray-400 mb-4">Session: 2022-2023</p>
+                        <div class="flex items-center">
+                            <div class="bg-blue-900 text-blue-100 px-4 py-1 rounded-full">
+                                <span class="font-semibold">Percentage: 72%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Technical <span class="gradient-text">Skills</span></h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-gray-900 p-8 rounded-2xl shadow-xl">
+                    <h3 class="text-2xl font-semibold mb-6 gradient-text">Programming Languages</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">C++</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress-width: 85%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Java</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress-width: 80%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Python</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress-width: 75%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">C</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress-width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-900 p-8 rounded-2xl shadow-xl">
+                    <h3 class="text-2xl font-semibold mb-6 gradient-text">Technologies & Tools</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Cloud Computing</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress-width: 85%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Data Structures</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress-width: 80%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Frontend Development</span>
+                                <span>70%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress-width: 70%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Network Operations</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="--progress-width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 text-center">
+                <div class="skill-card bg-gray-900 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+                    <i class="fab fa-html5 skill-icon"></i>
+                    <p class="font-semibold">HTML5</p>
+                </div>
+                <div class="skill-card bg-gray-900 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+                    <i class="fab fa-css3-alt skill-icon"></i>
+                    <p class="font-semibold">CSS3</p>
+                </div>
+                <div class="skill-card bg-gray-900 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+                    <i class="fab fa-js skill-icon"></i>
+                    <p class="font-semibold">JavaScript</p>
+                </div>
+                <div class="skill-card bg-gray-900 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+                    <i class="fab fa-aws skill-icon"></i>
+                    <p class="font-semibold">AWS</p>
+                </div>
+                <div class="skill-card bg-gray-900 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+                    <i class="fab fa-github skill-icon"></i>
+                    <p class="font-semibold">Git/GitHub</p>
+                </div>
+                <div class="skill-card bg-gray-900 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-2">
+                    <i class="fas fa-database skill-icon"></i>
+                    <p class="font-semibold">Databases</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Experience Section -->
+    <section id="experience" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Work <span class="gradient-text">Experience</span></h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto"></div>
+            </div>
+            <div class="max-w-3xl mx-auto">
+                <div class="timeline-item">
+                    <div class="bg-gray-800 p-6 rounded-2xl shadow-xl">
+                        <h3 class="text-2xl font-semibold mb-2 gradient-text">Google Arcade Labs</h3>
+                        <p class="text-gray-400 mb-4">
+                            <span class="bg-purple-900 text-purple-100 px-3 py-1 rounded-full text-sm">Cloud Computing</span>
+                        </p>
+                        <p class="text-gray-300 mb-4">Completed over 150 labs in Google Arcade, gaining hands-on experience with Google Cloud Platform services and solutions.</p>
+                        <ul class="list-disc list-inside text-gray-400 space-y-2">
+                            <li>Mastered cloud infrastructure deployment and management</li>
+                            <li>Implemented various cloud architecture patterns</li>
+                            <li>Worked with containerization and orchestration tools</li>
+                            <li>Built and deployed scalable cloud applications</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="bg-gray-800 p-6 rounded-2xl shadow-xl">
+                        <h3 class="text-2xl font-semibold mb-2 gradient-text">University Projects</h3>
+                        <p class="text-gray-400 mb-4">
+                            <span class="bg-blue-900 text-blue-100 px-3 py-1 rounded-full text-sm">Frontend Development</span>
+                        </p>
+                        <p class="text-gray-300 mb-4">Worked on various university projects focusing on frontend development and cloud integration.</p>
+                        <ul class="list-disc list-inside text-gray-400 space-y-2">
+                            <li>Designed responsive user interfaces</li>
+                            <li>Implemented modern web technologies</li>
+                            <li>Integrated frontend with cloud-based backends</li>
+                            <li>Collaborated with team members using version control systems</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">My <span class="gradient-text">Projects</span></h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card-3d bg-gray-900 overflow-hidden rounded-2xl shadow-xl">
+                    <div class="relative h-48">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900 z-10"></div>
+                        <div class="absolute inset-0 bg-gray-700"></div>
+                        <div class="absolute inset-0 flex items-center justify-center text-6xl text-gray-500 z-5">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                    </div>
+                    <div class="card-content p-6 relative z-20">
+                        <h3 class="text-xl font-semibold mb-2">Cloud-Based Storage System</h3>
+                        <p class="text-gray-400 mb-4">Developed a cloud-based storage system with secure file management capabilities.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-blue-900 bg-opacity-50 text-blue-200 px-2 py-1 rounded-full text-xs">AWS</span>
+                            <span class="bg-green-900 bg-opacity-50 text-green-200 px-2 py-1 rounded-full text-xs">Python</span>
+                            <span class="bg-yellow-900 bg-opacity-50 text-yellow-200 px-2 py-1 rounded-full text-xs">JavaScript</span>
+                        </div>
+                        <a href="#" class="inline-block bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 rounded-lg text-white font-semibold hover:opacity-90 transition-all">View Project</a>
+                    </div>
+                </div>
+                <div class="card-3d bg-gray-900 overflow-hidden rounded-2xl shadow-xl">
+                    <div class="relative h-48">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900 z-10"></div>
+                        <div class="absolute inset-0 bg-gray-700"></div>
+                        <div class="absolute inset-0 flex items-center justify-center text-6xl text-gray-500 z-5">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                    </div>
+                    <div class="card-content p-6 relative z-20">
+                        <h3 class="text-xl font-semibold mb-2">Responsive Web Application</h3>
+                        <p class="text-gray-400 mb-4">Created a responsive web application with modern UI/UX principles.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-purple-900 bg-opacity-50 text-purple-200 px-2 py-1 rounded-full text-xs">HTML5</span>
+                            <span class="bg-blue-900 bg-opacity-50 text-blue-200 px-2 py-1 rounded-full text-xs">CSS3</span>
+                            <span class="bg-yellow-900 bg-opacity-50 text-yellow-200 px-2 py-1 rounded-full text-xs">JavaScript</span>
+                        </div>
+                        <a href="#" class="inline-block bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 rounded-lg text-white font-semibold hover:opacity-90 transition-all">View Project</a>
+                    </div>
+                </div>
+                <div class="card-3d bg-gray-900 overflow-hidden rounded-2xl shadow-xl">
+                    <div class="relative h-48">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900 z-10"></div>
+                        <div class="absolute inset-0 bg-gray-700"></div>
+                        <div class="absolute inset-0 flex items-center justify-center text-6xl text-gray-500 z-5">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                    </div>
+                    <div class="card-content p-6 relative z-20">
+                        <h3 class="text-xl font-semibold mb-2">Data Structure Visualization</h3>
+                        <p class="text-gray-400 mb-4">Built an interactive tool for visualizing various data structures and algorithms.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-red-900 bg-opacity-50 text-red-200 px-2 py-1 rounded-full text-xs">C++</span>
+                            <span class="bg-blue-900 bg-opacity-50 text-blue-200 px-2 py-1 rounded-full text-xs">Data Structures</span>
+                            <span class="bg-green-900 bg-opacity-50 text-green-200 px-2 py-1 rounded-full text-xs">Algorithms</span>
+                        </div>
+                        <a href="#" class="inline-block bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 rounded-lg text-white font-semibold hover:opacity-90 transition-all">View Project</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Get In <span class="gradient-text">Touch</span></h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto"></div>
+                <p class="text-gray-400 mt-6 max-w-2xl mx-auto">Feel free to contact me for any questions or opportunities. I'm always open to discussing new projects, creative ideas or opportunities to be part of your vision.</p>
+            </div>
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/2">
+                    <div class="bg-gray-800 p-8 rounded-2xl shadow-xl h-full">
+                        <h3 class="text-2xl font-semibold mb-6 gradient-text">Contact Information</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-full bg-purple-900 bg-opacity-30 flex items-center justify-center mr-4">
+                                    <i class="fas fa-map-marker-alt text-purple-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold mb-1">Location</h4>
+                                    <p class="text-gray-400">#64, Modern valley, Kharar- 140301</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-full bg-blue-900 bg-opacity-30 flex items-center justify-center mr-4">
+                                    <i class="fas fa-envelope text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold mb-1">Email</h4>
+                                    <p class="text-gray-400">tusharpathneja99@gmail.com</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-full bg-green-900 bg-opacity-30 flex items-center justify-center mr-4">
+                                    <i class="fas fa-phone text-green-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold mb-1">Phone</h4>
+                                    <p class="text-gray-400">+91 8950365277</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-full bg-indigo-900 bg-opacity-30 flex items-center justify-center mr-4">
+                                    <i class="fab fa-linkedin-in text-indigo-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold mb-1">LinkedIn</h4>
+                                    <p class="text-gray-400">
+                                        <a href="https://www.linkedin.com/in/tushar-pathneja-4307b1275/" target="_blank" class="hover:text-white">Tushar Pathneja</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <div class="bg-gray-800 p-8 rounded-2xl shadow-xl">
+                        <h3 class="text-2xl font-semibold mb-6 gradient-text">Send Me a Message</h3>
+                        <form>
+                            <div class="mb-4">
+                                <label for="name" class="block text-gray-400 mb-2">Name</label>
+                                <input type="text" id="name" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500">
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-400 mb-2">Email</label>
+                                <input type="email" id="email" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500">
+                            </div>
+                            <div class="mb-4">
+                                <label for="subject" class="block text-gray-400 mb-2">Subject</label>
+                                <input type="text" id="subject" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500">
+                            </div>
+                            <div class="mb-6">
+                                <label for="message" class="block text-gray-400 mb-2">Message</label>
+                                <textarea id="message" rows="4" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500"></textarea>
+                            </div>
+                            <button type="button" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-10 bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-2xl font-bold gradient-text">Tushar Pathneja</h2>
+                    <p class="text-gray-400 mt-2">Computer Science Engineering Student</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="https://www.linkedin.com/in/tushar-pathneja-4307b1275/" target="_blank" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-blue-600 hover:text-white transition-all">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-blue-400 hover:text-white transition-all">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-900 transition-all">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="mailto:tusharpathneja99@gmail.com" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-red-500 hover:text-white transition-all">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-500">&copy; 2024 Tushar Pathneja. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // 3D Particle Background
+        window.addEventListener('load', function() {
+            const canvas = document.createElement('canvas');
+            document.getElementById('canvas-container').appendChild(canvas);
+            
+            const renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true
+            });
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            
+            camera.position.z = 20;
+            
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 2000;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            const colorArray = new Float32Array(particlesCount * 3);
+            
+            for(let i = 0; i < particlesCount * 3; i += 3) {
+                // Position
+                posArray[i] = (Math.random() - 0.5) * 50;
+                posArray[i+1] = (Math.random() - 0.5) * 50;
+                posArray[i+2] = (Math.random() - 0.5) * 50;
+                
+                // Color
+                colorArray[i] = Math.random() * 0.2 + 0.3; // R
+                colorArray[i+1] = Math.random() * 0.5 + 0.5; // G
+                colorArray[i+2] = Math.random() * 0.5 + 0.5; // B
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.7
+            });
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.x += 0.0005;
+                particlesMesh.rotation.y += 0.0005;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Resize handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            
+            // Scroll animations
+            const sections = document.querySelectorAll('section');
+            
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                
+                // Parallax effect for hero section
+                const heroSection = document.querySelector('.hero-section');
+                heroSection.style.backgroundPositionY = `${scrollY * 0.5}px`;
+                
+                // Animate elements when they come into view
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if(scrollY > sectionTop - window.innerHeight + sectionHeight / 3) {
+                        section.classList.add('animate-fade-in');
+                    }
+                });
+            });
+        });
+        
+        // Progress bar animation
+        const progressBars = document.querySelectorAll('.progress-bar');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const progressFill = entry.target.querySelector('.progress-fill');
+                    progressFill.style.animation = 'progress-animation 1.5s ease-out forwards';
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        progressBars.forEach(bar => {
+            observer.observe(bar);
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
